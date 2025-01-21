@@ -7,12 +7,12 @@
     <link rel="stylesheet" href="/styles.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function() {
-            $('form').on('submit', function(event) {
+        $(() => {
+            $('form').on('submit', (event) => {
                 event.preventDefault();
-                const message = $('input[name="message"]').val();
-                $.post('/message', { message: message }, function() {
-                    $('ul').append('<li>' + message + '</li>');
+                const { value: message } = $('input[name="message"]')[0];
+                $.post('/message', { message }, () => {
+                    $('ul').append(`<li>${message}</li>`);
                     $('input[name="message"]').val('');
                 });
             });
