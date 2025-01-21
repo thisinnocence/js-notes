@@ -36,6 +36,7 @@ class MessageBoardApp {
         this.app.use(express.urlencoded({ extended: true }));
         this.app.set('view engine', 'ejs');
         this.app.set('views', path.resolve('./views'));
+        this.app.use(express.static(path.resolve('./public')));
     }
 
     setupRoutes() {
