@@ -10,10 +10,23 @@
         ul { list-style-type: none; padding: 0; }
         li { background: #f4f4f4; margin: 0.5rem 0; padding: 0.5rem; border-radius: 5px; }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('form').on('submit', function(event) {
+                event.preventDefault();
+                const message = $('input[name="message"]').val();
+                $.post('/message', { message: message }, function() {
+                    $('ul').append('<li>' + message + '</li>');
+                    $('input[name="message"]').val('');
+                });
+            });
+        });
+    </script>
 </head>
 <body>
     <h1>Message Board</h1>
-    <form action="/message" method="POST">
+    <form>
         <input type="text" name="message" placeholder="Write a message..." required />
         <button type="submit">Post Message</button>
     </form>
