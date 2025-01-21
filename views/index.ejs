@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Board</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; }
+        form { margin-bottom: 2rem; }
+        ul { list-style-type: none; padding: 0; }
+        li { background: #f4f4f4; margin: 0.5rem 0; padding: 0.5rem; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Message Board</h1>
+    <form action="/message" method="POST">
+        <input type="text" name="message" placeholder="Write a message..." required />
+        <button type="submit">Post Message</button>
+    </form>
+    <ul>
+        <% messages.forEach(msg => { %>
+            <li><%= msg %></li>
+        <% }); %>
+    </ul>
+</body>
+</html>
