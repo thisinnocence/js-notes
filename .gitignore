@@ -16,6 +16,9 @@ build/
 # Log files
 *.log
 
+# db files
+*.db
+
 # Environment files
 .env
 .env.local

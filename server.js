@@ -1,13 +1,24 @@
 import express from 'express';
 import path from 'path';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
 class MessageBoardApp {
     constructor() {
         this.app = express();
         this.port = 3000;
-        this.messages = [];
+        this.setupDatabase();
         this.setupMiddleware();
         this.setupRoutes();
+    }
+
+    async setupDatabase() {
+        this.db = await open({
+            filename: './messages.db',
+            driver: sqlite3.Database
+        });
+
+        await this.db.exec('CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, message TEXT)');
     }
 
     setupMiddleware() {
@@ -17,13 +28,17 @@ class MessageBoardApp {
     }
 
     setupRoutes() {
-        this.app.post('/message', (req, res) => {
-            this.messages.push(req.body.message);
+        this.app.post('/message', async (req, res) => {
+            const message = req.body.message;
+            if (message) {
+                await this.db.run('INSERT INTO messages (message) VALUES (?)', message);
+            }
             res.redirect('/');
         });
 
-        this.app.get('/', (req, res) => {
-            res.render('index', { messages: this.messages });
+        this.app.get('/', async (req, res) => {
+            const messages = await this.db.all('SELECT message FROM messages');
+            res.render('index', { messages: messages.map(row => row.message) });
         });
     }
 
