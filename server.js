@@ -1,7 +1,6 @@
 import express from 'express';
 import path from 'path';
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
+import { Sequelize, DataTypes } from 'sequelize';
 
 class MessageBoardApp {
     constructor() {
@@ -12,13 +11,25 @@ class MessageBoardApp {
         this.setupRoutes();
     }
 
-    async setupDatabase() {
-        this.db = await open({
-            filename: './messages.db',
-            driver: sqlite3.Database
+    setupDatabase() {
+        this.sequelize = new Sequelize({
+            dialect: 'sqlite',
+            storage: './messages.db'
         });
 
-        await this.db.exec('CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, message TEXT)');
+        this.Message = this.sequelize.define('Message', {
+            id: {
+                type: DataTypes.INTEGER,
+                autoIncrement: true,
+                primaryKey: true
+            },
+            message: {
+                type: DataTypes.TEXT,
+                allowNull: false
+            }
+        });
+
+        this.sequelize.sync();
     }
 
     setupMiddleware() {
@@ -31,14 +42,14 @@ class MessageBoardApp {
         this.app.post('/message', async (req, res) => {
             const message = req.body.message;
             if (message) {
-                await this.db.run('INSERT INTO messages (message) VALUES (?)', message);
+                await this.Message.create({ message });
             }
             res.redirect('/');
         });
 
         this.app.get('/', async (req, res) => {
-            const messages = await this.db.all('SELECT message FROM messages');
-            res.render('index', { messages: messages.map(row => row.message) });
+            const messages = await this.Message.findAll();
+            res.render('index', { messages: messages.map(msg => msg.message) });
         });
     }
 
