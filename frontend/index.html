@@ -5,46 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Message Board</title>
     <link rel="stylesheet" href="/styles.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(() => {
-            const loadMessages = () => {
-                $.get('/api/messages')
-                    .done((messages) => {
-                        $('ul').empty();
-                        messages.forEach(message => {
-                            $('ul').append(`<li>${message.message}</li>`);
-                        });
-                    })
-                    .fail(() => {
-                        alert('Failed to load messages.');
-                    });
-            };
-
-            $('form').on('submit', (event) => {
-                event.preventDefault();
-                const message = $('input[name="message"]').val();
-                $.post('/api/messages', { message })
-                    .done(() => {
-                        loadMessages();
-                        $('input[name="message"]').val('');
-                    })
-                    .fail(() => {
-                        alert('Failed to post message.');
-                    });
-            });
-
-            loadMessages();
-        });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
-    <h1>Message Board</h1>
-    <form>
-        <input type="text" name="message" placeholder="Write a message..." required />
-        <button type="submit">Post Message</button>
-    </form>
-    <ul>
-    </ul>
+    <div id="app">
+        <h1>Message Board</h1>
+        <form @submit.prevent="postMessage">
+            <input type="text" v-model="newMessage" placeholder="Write a message..." required />
+            <button type="submit">Post Message</button>
+        </form>
+        <ul>
+            <li v-for="message in messages" :key="message.id">{{ message.message }}</li>
+        </ul>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                newMessage: '',
+                messages: []
+            },
+            created() {
+                this.loadMessages();
+            },
+            methods: {
+                loadMessages() {
+                    axios.get('/api/messages')
+                        .then(response => {
+                            this.messages = response.data;
+                        })
+                        .catch(() => {
+                            alert('Failed to load messages.');
+                        });
+                },
+                postMessage() {
+                    axios.post('/api/messages', { message: this.newMessage })
+                        .then(() => {
+                            this.loadMessages();
+                            this.newMessage = '';
+                        })
+                        .catch(() => {
+                            alert('Failed to post message.');
+                        });
+                }
+            }
+        });
+    </script>
 </body>
 </html>
