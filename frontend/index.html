@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/app.js" defer></script>
 </head>
 <body>
     <div id="app">
@@ -19,39 +20,5 @@
             <li v-for="message in messages" :key="message.id">{{ message.message }}</li>
         </ul>
     </div>
-
-    <script>
-        new Vue({
-            el: '#app',
-            data: {
-                newMessage: '',
-                messages: []
-            },
-            created() {
-                this.loadMessages();
-            },
-            methods: {
-                loadMessages() {
-                    axios.get('/api/messages')
-                        .then(response => {
-                            this.messages = response.data;
-                        })
-                        .catch(() => {
-                            alert('Failed to load messages.');
-                        });
-                },
-                postMessage() {
-                    axios.post('/api/messages', { message: this.newMessage })
-                        .then(() => {
-                            this.loadMessages();
-                            this.newMessage = '';
-                        })
-                        .catch(() => {
-                            alert('Failed to post message.');
-                        });
-                }
-            }
-        });
-    </script>
 </body>
 </html>
