@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Board</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(() => {
+            const loadMessages = () => {
+                $.get('/api/messages')
+                    .done((messages) => {
+                        $('ul').empty();
+                        messages.forEach(message => {
+                            $('ul').append(`<li>${message.message}</li>`);
+                        });
+                    })
+                    .fail(() => {
+                        alert('Failed to load messages.');
+                    });
+            };
+
+            $('form').on('submit', (event) => {
+                event.preventDefault();
+                const message = $('input[name="message"]').val();
+                $.post('/api/messages', { message })
+                    .done(() => {
+                        loadMessages();
+                        $('input[name="message"]').val('');
+                    })
+                    .fail(() => {
+                        alert('Failed to post message.');
+                    });
+            });
+
+            loadMessages();
+        });
+    </script>
+</head>
+<body>
+    <h1>Message Board</h1>
+    <form>
+        <input type="text" name="message" placeholder="Write a message..." required />
+        <button type="submit">Post Message</button>
+    </form>
+    <ul>
+    </ul>
+</body>
+</html>
