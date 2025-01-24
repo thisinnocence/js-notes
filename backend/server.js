@@ -53,7 +53,9 @@ class MessageBoardApp {
 
         this.app.get('/api/messages', async (req, res) => {
             try {
-                const messages = await this.Message.findAll();
+                const messages = await this.Message.findAll({
+                    order: [['createdAt', 'DESC']]
+                });
                 res.json(messages);
             } catch (error) {
                 res.status(500).json({ error: 'Internal Server Error' });
