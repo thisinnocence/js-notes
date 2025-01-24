@@ -46,7 +46,7 @@ class MessageBoardApp {
                 } else {
                     res.status(400).json({ error: 'Message content is required' });
                 }
-            } catch (error) {
+            } catch {
                 res.status(500).json({ error: 'Internal Server Error' });
             }
         });
@@ -57,7 +57,7 @@ class MessageBoardApp {
                     order: [['createdAt', 'DESC']]
                 });
                 res.json(messages);
-            } catch (error) {
+            } catch {
                 res.status(500).json({ error: 'Internal Server Error' });
             }
         });
