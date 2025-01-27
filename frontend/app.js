@@ -7,28 +7,26 @@ createApp({
             messages: []
         };
     },
-    created() {
-        this.loadMessages();
+    async created() {
+        await this.loadMessages();
     },
     methods: {
-        loadMessages() {
-            axios.get('/api/messages')
-                .then(response => {
-                    this.messages = response.data;
-                })
-                .catch(() => {
-                    alert('Failed to load messages.');
-                });
+        async loadMessages() {
+            try {
+                const response = await axios.get('/api/messages');
+                this.messages = response.data;
+            } catch (error) {
+                alert('Failed to load messages.');
+            }
         },
-        postMessage() {
-            axios.post('/api/messages', { message: this.newMessage })
-                .then(() => {
-                    this.loadMessages();
-                    this.newMessage = '';
-                })
-                .catch(() => {
-                    alert('Failed to post message.');
-                });
+        async postMessage() {
+            try {
+                await axios.post('/api/messages', { message: this.newMessage });
+                await this.loadMessages();
+                this.newMessage = '';
+            } catch (error) {
+                alert('Failed to post message.');
+            }
         }
     }
 }).mount('#app');
