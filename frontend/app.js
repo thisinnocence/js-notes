@@ -1,8 +1,11 @@
-new Vue({
-    el: '#app',
-    data: {
-        newMessage: '',
-        messages: []
+const { createApp } = Vue;
+
+createApp({
+    data() {
+        return {
+            newMessage: '',
+            messages: []
+        };
     },
     created() {
         this.loadMessages();
@@ -28,4 +31,4 @@ new Vue({
                 });
         }
     }
-});
+}).mount('#app');
