@@ -66,12 +66,42 @@ readFile().finally(
   () => console.log("[2]finally")
 )
 
-/* 结果：
-[1][INFO] call `then` to register callback function
-[2][INFO] into `async` function readFile
-[1]Error: File read failed!
-[1]next then data:  undefined
-[1]finaly
-[2]Success: File content: Hello World!
-[2]finally
+// https://zh.javascript.info/promise-api
+/* Promise 类有 6 种静态方法：
+Promise.all(promises) —— 等待所有 promise 都 resolve 时，返回存放它们结果的数组。如果给定的任意一个 promise 
+                         为 reject，那么它就会变成 Promise.all 的 error，所有其他 promise 的结果都会被忽略。
+Promise.allSettled(promises)（ES2020 新增方法）—— 等待所有 promise 都 settle 时，并以包含以下内容的对象数组的形式返回它们的结果：
+                                                  status: "fulfilled" 或 "rejected"
+                                                  value（如果 fulfilled）或 reason（如果 rejected）。
+Promise.race(promises) —— 等待第一个 settle 的 promise，并将其 result/error 作为结果返回。
+Promise.any(promises)（ES2021 新增方法）—— 等待第一个 fulfilled 的 promise，并将其结果作为结果返回。
+                                          如果所有 promise 都 rejected，Promise.any 则会抛出 AggregateError 错误类型的 error 实例。
+Promise.resolve(value) —— 使用给定 value 创建一个 resolved 的 promise。
+Promise.reject(error) —— 使用给定 error 创建一个 rejected 的 promise。
+以上所有方法，Promise.all 可能是在实战中使用最多的。
 */
+
+// 猜测一下 `Promise.all` 内部实现，返回一个新的promise，内部的状态变化取决于所有的all里的各个promise的变化
+//   1. 所有都resolve，触发这个新promise的state/result等变化，然后去调用then注册过来的回调
+//   2. 有1个reject，那么直接返回错误，忽略掉其依赖的其他promise
+let allPro = Promise.all([
+  new Promise(resolve => setTimeout(() => resolve(1), 300)), // 1
+  new Promise(resolve => setTimeout(() => resolve(2), 200)), // 2
+  new Promise(resolve => setTimeout(() => resolve(3), 100))  // 3
+])
+
+// use `then` to register callback, only proc `resolve result`
+allPro.then(
+  data => console.log("[3][INFO] Promise.all:", data)
+)
+
+// use `async` to proc promise
+const callAll = async () => {
+  try{
+    let data = await allPro;
+    console.log("[3][INFO] async Promise all,", data);
+  } catch {
+    console.error("[3][Error: ", err.message)
+  }
+}
+callAll();
