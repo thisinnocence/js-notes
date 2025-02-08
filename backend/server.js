@@ -26,6 +26,11 @@ class MessageBoardApp {
             message: {
                 type: DataTypes.TEXT,
                 allowNull: false
+            },
+            timestamp: {
+                type: DataTypes.DATE,
+                allowNull: false,
+                defaultValue: DataTypes.NOW
             }
         });
     }
@@ -39,14 +44,17 @@ class MessageBoardApp {
     setupRoutes() {
         this.app.post('/api/messages', async (req, res) => {
             try {
-                const { message } = req.body;
-                if (message) {
-                    const newMessage = await this.Message.create({ message });
-                    res.status(201).json(newMessage);
-                } else {
-                    res.status(400).json({ error: 'Message content is required' });
+                const { message, timestamp } = req.body;
+                if (!message) {
+                    return res.status(400).json({ error: 'Message content is required' });
                 }
-            } catch {
+                const newMessage = await this.Message.create({ 
+                    message,
+                    timestamp: timestamp || new Date()
+                });
+                res.status(201).json(newMessage);
+            } catch (error) {
+                console.error('Error creating message:', error);
                 res.status(500).json({ error: 'Internal Server Error' });
             }
         });
@@ -54,10 +62,27 @@ class MessageBoardApp {
         this.app.get('/api/messages', async (req, res) => {
             try {
                 const messages = await this.Message.findAll({
-                    order: [['createdAt', 'DESC']]
+                    order: [['timestamp', 'DESC']]
                 });
                 res.json(messages);
-            } catch {
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+                res.status(500).json({ error: 'Internal Server Error' });
+            }
+        });
+
+        this.app.delete('/api/messages/:id', async (req, res) => {
+            try {
+                const { id } = req.params;
+                const result = await this.Message.destroy({
+                    where: { id }
+                });
+                if (result === 0) {
+                    return res.status(404).json({ error: 'Message not found' });
+                }
+                res.status(204).send();
+            } catch (error) {
+                console.error('Error deleting message:', error);
                 res.status(500).json({ error: 'Internal Server Error' });
             }
         });
