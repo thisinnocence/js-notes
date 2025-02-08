@@ -11,45 +11,67 @@
     <script src="/app.js" defer></script>
 </head>
 
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
-    <div id="app" class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md md:max-w-lg lg:max-w-2xl">
-        <h1 class="text-2xl font-bold mb-4 text-center text-gray-800">Message Board</h1>
-        <form @submit.prevent="postMessage" class="mb-6">
-            <div class="flex">
-                <input type="text" v-model="newMessage"
-                    class="flex-grow p-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    placeholder="Write a message..." required />
-                <button type="submit" 
-                    class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-r-lg transition duration-200">
-                    Post
-                </button>
-            </div>
-        </form>
-        
-        <div v-if="isLoading" class="text-center py-4">
-            <p class="text-gray-600">Loading messages...</p>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- 固定顶部导航 -->
+    <header class="bg-white shadow-sm fixed w-full top-0 z-10">
+        <div class="container mx-auto px-4 h-16 flex items-center">
+            <h1 class="text-2xl font-bold text-gray-800">Message Board</h1>
         </div>
-        
-        <div v-else-if="messages.length === 0" class="text-center py-4">
-            <p class="text-gray-600">No messages yet. Be the first to post!</p>
-        </div>
-        
-        <ul v-else class="space-y-3">
-            <li v-for="message in messages" :key="message.id" 
-                class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition duration-200">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-gray-800">{{ message.message }}</p>
-                        <span class="text-sm text-gray-500">{{ message.timestamp }}</span>
-                    </div>
-                    <button @click="deleteMessage(message.id)" 
-                        class="text-red-500 hover:text-red-600 p-1">
-                        <span class="text-sm">Delete</span>
+    </header>
+
+    <!-- 主要内容区 -->
+    <div id="app" class="container mx-auto px-4 mt-20 mb-8 flex-grow">
+        <!-- 消息输入区 -->
+        <div class="max-w-4xl mx-auto mb-8">
+            <form @submit.prevent="postMessage" class="bg-white p-6 rounded-lg shadow-sm">
+                <div class="flex gap-2">
+                    <input type="text" v-model="newMessage"
+                        class="flex-grow p-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        placeholder="Share your thoughts..." required />
+                    <button type="submit" 
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-lg transition duration-200 font-medium">
+                        Post Message
                     </button>
                 </div>
-            </li>
-        </ul>
+            </form>
+        </div>
+
+        <!-- 消息列表区 -->
+        <div class="max-w-4xl mx-auto">
+            <div v-if="isLoading" class="text-center py-8">
+                <p class="text-gray-600 text-lg">Loading messages...</p>
+            </div>
+            
+            <div v-else-if="messages.length === 0" class="text-center py-16 bg-white rounded-lg shadow-sm">
+                <p class="text-gray-600 text-lg">No messages yet. Be the first to post!</p>
+            </div>
+            
+            <div v-else class="space-y-4">
+                <div v-for="message in messages" :key="message.id" 
+                    class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition duration-200">
+                    <div class="flex justify-between items-start gap-4">
+                        <div class="flex-grow">
+                            <p class="text-gray-800 text-lg mb-2">{{ message.message }}</p>
+                            <div class="flex items-center gap-4">
+                                <span class="text-sm text-gray-500">{{ message.timestamp }}</span>
+                                <button @click="deleteMessage(message.id)" 
+                                    class="text-red-500 hover:text-red-600 text-sm font-medium">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-gray-200 py-4">
+        <div class="container mx-auto px-4 text-center text-gray-600">
+            <p>Message Board App © 2024</p>
+        </div>
+    </footer>
 </body>
 
 </html>
