@@ -71,6 +71,34 @@ class MessageBoardApp {
             }
         });
 
+        this.app.put('/api/messages/:id', async (req, res) => {
+            try {
+                const { id } = req.params;
+                const { message } = req.body;
+                
+                if (!message) {
+                    return res.status(400).json({ error: 'Message content is required' });
+                }
+
+                const [updateCount, updatedMessages] = await this.Message.update(
+                    { message },
+                    { 
+                        where: { id },
+                        returning: true
+                    }
+                );
+
+                if (updateCount === 0) {
+                    return res.status(404).json({ error: 'Message not found' });
+                }
+
+                res.json(updatedMessages[0]);
+            } catch (error) {
+                console.error('Error updating message:', error);
+                res.status(500).json({ error: 'Internal Server Error' });
+            }
+        });
+
         this.app.delete('/api/messages/:id', async (req, res) => {
             try {
                 const { id } = req.params;

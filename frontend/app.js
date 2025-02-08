@@ -5,7 +5,9 @@ createApp({
         return {
             newMessage: '',
             messages: [],
-            isLoading: false
+            isLoading: false,
+            editingMessage: null,
+            editText: ''
         };
     },
     async created() {
@@ -45,6 +47,26 @@ createApp({
                 await this.loadMessages();
             } catch (error) {
                 alert('Failed to delete message.');
+            }
+        },
+        startEdit(message) {
+            this.editingMessage = message.id;
+            this.editText = message.message;
+        },
+        cancelEdit() {
+            this.editingMessage = null;
+            this.editText = '';
+        },
+        async saveEdit() {
+            if (!this.editText.trim()) return;
+            try {
+                await axios.put(`/api/messages/${this.editingMessage}`, {
+                    message: this.editText
+                });
+                await this.loadMessages();
+                this.cancelEdit();
+            } catch (error) {
+                alert('Failed to update message.');
             }
         }
     }
