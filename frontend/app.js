@@ -1,3 +1,10 @@
+const messageApi = {
+    get: () => axios.get('/api/messages'),
+    post: (message, timestamp) => axios.post('/api/messages', { message, timestamp }),
+    delete: (id) => axios.delete(`/api/messages/${id}`),
+    put: (id, message) => axios.put(`/api/messages/${id}`, { message })
+};
+
 const { createApp } = Vue;
 
 createApp({
@@ -17,7 +24,7 @@ createApp({
         async loadMessages() {
             this.isLoading = true;
             try {
-                const response = await axios.get('/api/messages');
+                const response = await messageApi.get();
                 this.messages = response.data.map(msg => ({
                     ...msg,
                     timestamp: new Date(msg.timestamp).toLocaleString()
@@ -31,10 +38,7 @@ createApp({
         async postMessage() {
             if (!this.newMessage.trim()) return;
             try {
-                await axios.post('/api/messages', { 
-                    message: this.newMessage,
-                    timestamp: new Date()
-                });
+                await messageApi.post(this.newMessage, new Date());
                 await this.loadMessages();
                 this.newMessage = '';
             } catch (error) {
@@ -43,7 +47,7 @@ createApp({
         },
         async deleteMessage(id) {
             try {
-                await axios.delete(`/api/messages/${id}`);
+                await messageApi.delete(id);
                 await this.loadMessages();
             } catch (error) {
                 alert('Failed to delete message.');
@@ -60,9 +64,7 @@ createApp({
         async saveEdit() {
             if (!this.editText.trim()) return;
             try {
-                await axios.put(`/api/messages/${this.editingMessage}`, {
-                    message: this.editText
-                });
+                await messageApi.put(this.editingMessage, this.editText);
                 await this.loadMessages();
                 this.cancelEdit();
             } catch (error) {
