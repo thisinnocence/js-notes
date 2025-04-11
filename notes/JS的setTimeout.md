@@ -66,7 +66,7 @@ void event_loop() {
 
 ### 2.2 定时器处理的内核级实现
 
-以 Node.js 的 libuv 实现为例（[源码](https://github.com/libuv/libuv/blob/v1.x/src/unix/timer.c)）：
+以 Node.js 的 libuv 实现为例。
 
 ```c
 // 近似伪代码
