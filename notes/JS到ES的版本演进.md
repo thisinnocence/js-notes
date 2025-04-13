@@ -1,6 +1,6 @@
 # JavaScript 模块化演进：从 CommonJS 到 ES Modules (ESM) 及版本推荐
 
-## ** ECMAScript (ES) 版本演进与模块化发展
+## ECMAScript (ES) 版本演进与模块化发展
 
 ### 1. ES5 及之前：无模块化标准
 
@@ -74,7 +74,7 @@
 
 - **新项目**：
 
-  ```json
+  ```js
   // package.json
   {
     "type": "module",  // 所有 .js 文件默认 ESM
