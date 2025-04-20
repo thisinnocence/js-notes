@@ -1,17 +1,20 @@
-import express from 'express';
+import fastify from 'fastify';
 import path from 'path';
 import { Sequelize, DataTypes } from 'sequelize';
 import process from 'process';
+import fastifyStatic from '@fastify/static';
 
 class MessageBoardApp {
     constructor() {
-        this.app = express();
+        // 初始化 Fastify 应用
+        this.app = fastify({ logger: true });
         this.port = 3000;
         this.setupDatabase();
         this.setupMiddleware();
         this.setupRoutes();
     }
 
+    // 数据库设置 (保持不变)
     setupDatabase() {
         this.sequelize = new Sequelize({
             dialect: 'sqlite',
@@ -36,81 +39,92 @@ class MessageBoardApp {
         });
     }
 
-    setupMiddleware() {
-        this.app.use(express.urlencoded({ extended: true }));
-        this.app.use(express.json());
-        this.app.use(express.static(path.resolve('./frontend')));
-        this.app.use(this.errorHandler.bind(this));
+    // 中间件设置 (调整为 Fastify 插件方式)
+    async setupMiddleware() {
+        // 静态文件服务
+        await this.app.register(fastifyStatic, {
+            root: path.resolve('./frontend'),
+            prefix: '/'
+        });
     }
 
-    // 统一的错误处理中间件
-    errorHandler(err, _req, res, next) {
-        console.error('Error:', err);
-        res.statusCode = err.status || 500;
-        res.json({ error: err.message || 'Internal Server Error' });
-        next();
-    }
-
-    // 统一的异步处理包装器
-    asyncHandler(fn) {
-        return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
-    }
-
+    // 路由设置 (调整为 Fastify 路由语法)
     setupRoutes() {
-        this.app.post('/api/messages', this.asyncHandler(async (req, res) => {
-            const { message, timestamp } = req.body;
-            if (!message) throw { status: 400, message: 'Message content is required' };
+        // 创建新消息
+        this.app.post('/api/messages', async (request, reply) => {
+            const { message, timestamp } = request.body;
+            if (!message) {
+                throw this.app.httpErrors.badRequest('Message content is required');
+            }
             
             const newMessage = await this.Message.create({ 
                 message,
                 timestamp: timestamp || new Date()
             });
-            res.status(201).json(newMessage);
-        }));
+            return reply.code(201).send(newMessage);
+        });
 
-        this.app.get('/api/messages', this.asyncHandler(async (req, res) => {
+        // 获取所有消息
+        this.app.get('/api/messages', async () => {
             const messages = await this.Message.findAll({
                 order: [['timestamp', 'DESC']]
             });
-            res.json(messages);
-        }));
+            return messages;
+        });
 
-        this.app.put('/api/messages/:id', this.asyncHandler(async (req, res) => {
-            const { id } = req.params;
-            const { message } = req.body;
+        // 更新消息
+        this.app.put('/api/messages/:id', async (request, reply) => {
+            const { id } = request.params;
+            const { message } = request.body;
             
-            if (!message) throw { status: 400, message: 'Message content is required' };
+            if (!message) {
+                throw this.app.httpErrors.badRequest('Message content is required');
+            }
 
             const [updateCount, updatedMessages] = await this.Message.update(
                 { message },
                 { where: { id }, returning: true }
             );
 
-            if (updateCount === 0) throw { status: 404, message: 'Message not found' };
-            res.json(updatedMessages[0]);
-        }));
+            if (updateCount === 0) {
+                throw this.app.httpErrors.notFound('Message not found');
+            }
+            return updatedMessages[0];
+        });
 
-        this.app.delete('/api/messages/:id', this.asyncHandler(async (req, res) => {
-            const { id } = req.params;
+        // 删除消息
+        this.app.delete('/api/messages/:id', async (request, reply) => {
+            const { id } = request.params;
             const result = await this.Message.destroy({ where: { id } });
             
-            if (result === 0) throw { status: 404, message: 'Message not found' };
-            res.status(204).send();
-        }));
+            if (result === 0) {
+                throw this.app.httpErrors.notFound('Message not found');
+            }
+            return reply.code(204).send();
+        });
 
-        this.app.get('/', (req, res) => {
-            res.sendFile(path.resolve('./frontend/index.html'));
+        // 主页面路由
+        this.app.get('/', async (_, reply) => {
+            return reply.sendFile('index.html', path.resolve('./frontend'));
+        });
+
+        // 错误处理 (Fastify 内置了错误处理，这里添加自定义处理)
+        this.app.setErrorHandler((error, request, reply) => {
+            this.app.log.error(error);
+            if (error.statusCode) {
+                return reply.code(error.statusCode).send({ error: error.message });
+            }
+            return reply.code(500).send({ error: 'Internal Server Error' });
         });
     }
 
     async start() {
         try {
             await this.sequelize.sync();
-            this.app.listen(this.port, () => {
-                console.log(`Server running at http://localhost:${this.port}`);
-            });
+            await this.app.listen({ port: this.port });
+            this.app.log.info(`Server running at http://localhost:${this.port}`);
         } catch (error) {
-            console.error('Unable to start the server:', error);
+            this.app.log.error('Unable to start the server:', error);
             process.exit(1);
         }
     }
