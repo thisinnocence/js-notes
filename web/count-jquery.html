@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(function () {
+      // ========== 状态变量声明 ==========
+      let count = 0;      // 当前计数（0表示准备阶段）
+      let round = 1;      // 当前轮次
+
+      // ========== 初始DOM渲染 ==========
+      // 更新轮次显示区域（永久显示）
+      $('#round').text(`第${round}轮`);
+      // 清空计数显示区域（初始不显示数字）
+      $('#counter').text('');
+
+      // ========== 定时器逻辑 ==========
+      let timer = setInterval(() => {
+        // >>> 状态计算：计数器递增 <<<
+        count++;
+
+        // >>> DOM更新：仅更新计数部分 <<<
+        $('#counter').text(count);
+
+        // ===== 检查是否完成一轮计数 =====
+        if (count >= 10) {
+          // >>> 状态计算 <<<
+          count = 0;   // 重置计数器
+          round++;     // 轮次递增
+
+          // >>> DOM更新 <<<
+          $('#round').text(`第${round}轮`); // 更新轮次显示
+          $('#counter').text('');           // 清空计数显示
+        }
+      }, 1000); // 每秒触发一次
+    });
+  </script>
+</head>
+
+<body>
+  <!-- 
+    DOM结构说明：
+      - round: 固定显示当前轮次（如"第1轮"）
+      - counter: 动态显示1-10的计数 
+  -->
+  <div>
+    <span id="round"></span>
+    <span id="counter"></span>
+  </div>
+</body>
+
+</html>
