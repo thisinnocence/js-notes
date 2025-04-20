@@ -2,101 +2,98 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Message Board</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/vue@3.2.31/dist/vue.global.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="/app.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Message Board</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/vue@3.2.31/dist/vue.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="/app.js" defer></script>
 </head>
 
 <body class="bg-gray-50 min-h-screen flex flex-col">
-    <!-- 固定顶部导航 -->
-    <header class="bg-white shadow-sm fixed w-full top-0 z-10">
-        <div class="container mx-auto px-4 h-16 flex items-center">
-            <h1 class="text-2xl font-bold text-gray-800">Message Board</h1>
-        </div>
-    </header>
+  <!-- 固定顶部导航 -->
+  <header class="bg-white shadow-sm fixed w-full top-0 z-10">
+    <div class="container mx-auto px-4 h-16 flex items-center">
+      <h1 class="text-2xl font-bold text-gray-800">Message Board</h1>
+    </div>
+  </header>
 
-    <!-- 主要内容区 -->
-    <div id="app" class="container mx-auto px-4 mt-20 mb-8 flex-grow">
-        <!-- 消息输入区 -->
-        <div class="max-w-4xl mx-auto mb-8">
-            <form @submit.prevent="postMessage" class="bg-white p-6 rounded-lg shadow-sm">
-                <div class="flex gap-2">
-                    <input type="text" v-model="newMessage"
-                        class="flex-grow p-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        placeholder="Share your thoughts..." required />
-                    <button type="submit" 
-                        class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-lg transition duration-200 font-medium">
-                        Post Message
-                    </button>
-                </div>
-            </form>
+  <!-- 主要内容区 -->
+  <div id="app" class="container mx-auto px-4 mt-20 mb-8 flex-grow">
+    <!-- 消息输入区 -->
+    <div class="max-w-4xl mx-auto mb-8">
+      <form @submit.prevent="postMessage" class="bg-white p-6 rounded-lg shadow-sm">
+        <div class="flex gap-2">
+          <input type="text" v-model="newMessage"
+            class="flex-grow p-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="Share your thoughts..." required />
+          <button type="submit"
+            class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-lg transition duration-200 font-medium">
+            Post Message
+          </button>
         </div>
-
-        <!-- 消息列表区 -->
-        <div class="max-w-4xl mx-auto">
-            <div v-if="isLoading" class="text-center py-8">
-                <p class="text-gray-600 text-lg">Loading messages...</p>
-            </div>
-            
-            <div v-else-if="messages.length === 0" class="text-center py-16 bg-white rounded-lg shadow-sm">
-                <p class="text-gray-600 text-lg">No messages yet. Be the first to post!</p>
-            </div>
-            
-            <div v-else class="space-y-4">
-                <div v-for="message in messages" :key="message.id" 
-                    class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition duration-200">
-                    <div class="flex justify-between items-start gap-4">
-                        <div class="flex-grow">
-                            <!-- 编辑模式 -->
-                            <div v-if="editingMessage === message.id" class="w-full">
-                                <textarea 
-                                    v-model="editText"
-                                    class="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 mb-2"
-                                    rows="3"
-                                ></textarea>
-                                <div class="flex gap-2">
-                                    <button @click="saveEdit"
-                                        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm">
-                                        Save
-                                    </button>
-                                    <button @click="cancelEdit"
-                                        class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm">
-                                        Cancel
-                                    </button>
-                                </div>
-                            </div>
-                            <!-- 显示模式 -->
-                            <div v-else>
-                                <p class="text-gray-800 text-lg mb-2">{{ message.message }}</p>
-                                <div class="flex items-center gap-4">
-                                    <span class="text-sm text-gray-500">{{ message.timestamp }}</span>
-                                    <button @click="startEdit(message)" 
-                                        class="text-blue-500 hover:text-blue-600 text-sm font-medium">
-                                        Edit
-                                    </button>
-                                    <button @click="deleteMessage(message.id)" 
-                                        class="text-red-500 hover:text-red-600 text-sm font-medium">
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </form>
     </div>
 
-    <!-- 页脚 -->
-    <footer class="bg-white border-t border-gray-200 py-4">
-        <div class="container mx-auto px-4 text-center text-gray-600">
-            <p>Message Board App © 2024</p>
+    <!-- 消息列表区 -->
+    <div class="max-w-4xl mx-auto">
+      <div v-if="isLoading" class="text-center py-8">
+        <p class="text-gray-600 text-lg">Loading messages...</p>
+      </div>
+
+      <div v-else-if="messages.length === 0" class="text-center py-16 bg-white rounded-lg shadow-sm">
+        <p class="text-gray-600 text-lg">No messages yet. Be the first to post!</p>
+      </div>
+
+      <div v-else class="space-y-4">
+        <div v-for="message in messages" :key="message.id"
+          class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition duration-200">
+          <div class="flex justify-between items-start gap-4">
+            <div class="flex-grow">
+              <!-- 编辑模式 -->
+              <div v-if="editingMessage === message.id" class="w-full">
+                <textarea v-model="editText"
+                  class="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 mb-2"
+                  rows="3"></textarea>
+                <div class="flex gap-2">
+                  <button @click="saveEdit"
+                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm">
+                    Save
+                  </button>
+                  <button @click="cancelEdit"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+              <!-- 显示模式 -->
+              <div v-else>
+                <p class="text-gray-800 text-lg mb-2">{{ message.message }}</p>
+                <div class="flex items-center gap-4">
+                  <span class="text-sm text-gray-500">{{ message.timestamp }}</span>
+                  <button @click="startEdit(message)" class="text-blue-500 hover:text-blue-600 text-sm font-medium">
+                    Edit
+                  </button>
+                  <button @click="deleteMessage(message.id)"
+                    class="text-red-500 hover:text-red-600 text-sm font-medium">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-    </footer>
+      </div>
+    </div>
+  </div>
+
+  <!-- 页脚 -->
+  <footer class="bg-white border-t border-gray-200 py-4">
+    <div class="container mx-auto px-4 text-center text-gray-600">
+      <p>Message Board App © 2024</p>
+    </div>
+  </footer>
 </body>
 
 </html>
