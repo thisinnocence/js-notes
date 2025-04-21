@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Posts</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <style>
+    body {
+      font-family: Arial;
+      max-width: 600px;
+      margin: 20px auto;
+    }
+
+    button {
+      padding: 8px 12px;
+      margin-top: 10px;
+    }
+
+    ul {
+      padding: 0;
+      list-style: none;
+    }
+
+    li {
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <h1>帖子列表</h1>
+    <ul>
+      <li v-for="post in posts" :key="post.id">{{ post.title }}</li>
+    </ul>
+    <input v-model="newPostTitle" placeholder="输入新帖子标题">
+    <button @click="addPost">提交新帖子</button>
+    <p v-if="loading">加载中...</p>
+    <p v-if="error" style="color:red">{{ error }}</p>
+  </div>
+
+  <script>
+    const { createApp, ref, onMounted } = Vue;
+
+    createApp({
+      setup() {
+        const posts = ref([]);
+        const newPostTitle = ref('');
+        const loading = ref(false);
+        const error = ref(null);
+
+        // 获取帖子列表
+        const fetchPosts = async () => {
+          loading.value = true;
+          try {
+            const res = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=3');
+            posts.value = res.data;
+          } catch (err) {
+            error.value = '获取失败: ' + err.message;
+          } finally {
+            loading.value = false;
+          }
+        };
+
+        // 提交新帖子
+        const addPost = async () => {
+          if (!newPostTitle.value.trim()) return;
+
+          loading.value = true;
+          try {
+            await axios.post('https://jsonplaceholder.typicode.com/posts', {
+              title: newPostTitle.value,
+              body: '这是测试内容',
+              userId: 1
+            });
+            console.log('提交成功');
+            newPostTitle.value = ''; // 清空输入框
+            fetchPosts(); // 重新获取最新列表
+          } catch (err) {
+            error.value = '提交失败: ' + err.message;
+          } finally {
+            loading.value = false;
+          }
+        };
+
+        onMounted(fetchPosts); // 组件加载时获取数据
+
+        return { posts, newPostTitle, loading, error, addPost };
+      }
+    }).mount('#app');
+  </script>
+</body>
+
+</html>
