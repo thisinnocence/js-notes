@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User list</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <style>
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Vue 3 的指令式语法 -->
+  <!--    指令会会被 Vue 编译器直接解析为 JavaScript 表达式, 在HTML属性的位置-->
+  <div id="app">
+    <h1>User list:</h1>
+    <div v-if="error" class="error">{{ error }}</div>
+    <ul v-else-if="users.length">
+      <li v-for="user in users" :key="user.id">
+        {{ user.first_name }} {{ user.last_name }} ({{ user.email }})
+      </li>
+    </ul>
+    <p v-else>loading...</p>
+  </div>
+
+  <script>
+    const { createApp, ref, onMounted } = Vue;
+    createApp({
+      setup() {
+        const users = ref([]);
+        const error = ref(null);
+        onMounted(async () => {
+          try {
+            // 在线的测试API, 帮助测试
+            const response = await axios.get('https://reqres.in/api/users');
+            console.log(response.data.data)
+            users.value = response.data.data; // Axios 自动解析 JSON
+          } catch (err) {
+            error.value = '请求失败: ' + err.message;
+          }
+        });
+
+        return { users, error };
+      }
+    }).mount('#app');
+  </script>
+</body>
+
+</html>
