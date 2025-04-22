@@ -34,6 +34,7 @@
   <div id="app">
     <h1>帖子列表</h1>
     <ul>
+      <!-- :key 为每个循环项提供唯一标识，: 是 v-bind: 的缩写 -->
       <li v-for="post in posts" :key="post.id">{{ post.title }}</li>
     </ul>
     <input v-model="newPostTitle" placeholder="输入新帖子标题">
@@ -43,10 +44,12 @@
   </div>
 
   <script>
+    // 解构赋值
     const { createApp, ref, onMounted } = Vue;
 
     createApp({
       setup() {
+        // 推荐一律用ref
         const posts = ref([]);
         const newPostTitle = ref('');
         const loading = ref(false);
