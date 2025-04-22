@@ -15,31 +15,40 @@
 </head>
 
 <body>
-  <!-- Vue 3 的指令式语法 -->
-  <!--    指令会会被 Vue 编译器直接解析为 JavaScript 表达式, 在HTML属性的位置-->
   <div id="app">
-    <h1>User list:</h1>
-    <div v-if="error" class="error">{{ error }}</div>
-    <ul v-else-if="users.length">
-      <li v-for="user in users" :key="user.id">
-        {{ user.first_name }} {{ user.last_name }} ({{ user.email }})
-      </li>
-    </ul>
-    <p v-else>loading...</p>
+    <user-list></user-list>
   </div>
+
+  <!-- 使用 template 标签定义组件模板 -->
+  <template id="user-list-template">
+    <div>
+      <h1>User list:</h1>
+      <div v-if="error" class="error">{{ error }}</div>
+      <ul v-else-if="users.length">
+        <li v-for="user in users" :key="user.id">
+          {{ user.first_name }} {{ user.last_name }} ({{ user.email }})
+        </li>
+      </ul>
+      <p v-else>loading...</p>
+    </div>
+  </template>
 
   <script>
     const { createApp, ref, onMounted } = Vue;
-    createApp({
+
+    // 定义组件
+    const UserList = {
+      template: '#user-list-template',
       setup() {
         const users = ref([]);
         const error = ref(null);
+
         onMounted(async () => {
           try {
-            // 在线的测试API, 帮助测试
+            // 在线的公开测试API，方便调测
             const response = await axios.get('https://reqres.in/api/users');
-            console.log(response.data.data)
-            users.value = response.data.data; // Axios 自动解析 JSON
+            console.log(response)
+            users.value = response.data.data;
           } catch (err) {
             error.value = '请求失败: ' + err.message;
           }
@@ -47,7 +56,17 @@
 
         return { users, error };
       }
-    }).mount('#app');
+    };
+
+    // 创建应用并注册组件
+    const app = createApp({
+      // components 注册：将组件注入到当前组件的组件解析上下文中
+      components: {
+        UserList
+      }
+    });
+
+    app.mount('#app');
   </script>
 </body>
 
