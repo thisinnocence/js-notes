@@ -1,31 +1,24 @@
-# Node.js dependencies
-node_modules/
+# node
+node_modules
 
-# Optional npm cache directory
-.npm/
-
-# npm logs
-npm-debug.log
-yarn-debug.log
-yarn-error.log
-
-# Directory for build outputs (e.g., dist or build)
+# build outputs
 dist/
 build/
 
-# Log files
-*.log
-
-# db files
+# db
 *.db
 
-# Environment files
+# log
+*.log
+
+# env
 .env
 .env.local
 .env.*.local
 
-# VSCode configuration
+# vscode
 .vscode/
+!.vscode/extensions.json
 
 # Just for learn, so ignore package-lock.json
 package-lock.json
