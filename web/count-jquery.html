@@ -19,16 +19,13 @@
       let timer = setInterval(() => {
         // >>> 状态计算：计数器递增 <<<
         count++;
-
         // >>> DOM更新：仅更新计数部分 <<<
         $('#counter').text(count);
-
         // ===== 检查是否完成一轮计数 =====
         if (count >= 10) {
           // >>> 状态计算 <<<
           count = 0;   // 重置计数器
           round++;     // 轮次递增
-
           // >>> DOM更新 <<<
           $('#round').text(`第${round}轮`); // 更新轮次显示
           $('#counter').text('');           // 清空计数显示

@@ -2,18 +2,15 @@
 <html>
 
 <head>
-  <title>Vue 3 count</title>
-  <!-- 直接引入Vue 3 CDN -->
+  <title>Vue count</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
 
 <body>
-  <!-- 直接写到div里了，所以不用template标签了 -->
-  <!-- 模板开始（Vue会编译这部分） -->
+  <!-- 模板开始（Vue会编译这部分）,直接写到div里，不需要template标签 -->
   <div id="app">
-    <!-- 使用响应式数据round -->
+    <!-- 使用响应式数据, 数据变化自动刷新DOM -->
     <span>第{{ round }}轮</span>
-    <!-- 使用响应式数据count（大于0时显示） -->
     <span>{{ count > 0 ? count : '' }}</span>
   </div>
   <!-- 模板结束 -->
@@ -27,13 +24,12 @@
         const round = ref(1);    // 当前轮次
         const count = ref(0);    // 当前计数（0表示准备阶段）
 
-        // ========== 定时器逻辑 ==========
         onMounted(() => {
           setInterval(() => {
-            // 每次计数+1
+            // 1000ms超时后执行
+            // count加1
             count.value++;
-
-            // 当计数到10时重置
+            // 当count到10时重置, round加1
             if (count.value > 10) {
               count.value = 0;
               round.value++;
@@ -41,11 +37,11 @@
           }, 1000);
         });
 
-        // 这里return的数据会自动提供给上面的模板使用
+        // 返回响应式数据
         return { round, count };
       }
     }).mount('#app'); // 挂载到包含模板的DOM元素
-    // # 符号是CSS中用于选择ID的选择器, #app 表示选择ID为 app 的元素
+    // #是CSS中用于选择ID的选择器, #app 表示选择ID为 app 的元素
   </script>
 </body>
 
