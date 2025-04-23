@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Vue 3 跳转示例</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+
+  <script>
+    const { createApp, ref, onMounted } = Vue;
+
+    // 计数组件: 展示倒计时并在指定时间后触发页面跳转
+    const CounterPage = {
+      // 使用 emit 向父组件发送跳转事件
+      template: `
+        <div>
+          <h1>美妙 +{{ count }}</h1>
+          <p>请稍等，马上进入感谢页面...</p>
+        </div>
+      `,
+      setup(props, { emit }) {
+        // 计数器状态管理
+        const count = ref(0);
+        let intervalId;
+
+        // 组件挂载时启动计时器和跳转逻辑
+        onMounted(() => {
+          // 设置计数器，每秒递增
+          intervalId = setInterval(() => {
+            count.value++;
+          }, 1000);
+
+          // 8秒后清除计时器并触发跳转事件
+          // 使用 emit 发送 'navigate' 事件，携带目标页面名称
+          setTimeout(() => {
+            clearInterval(intervalId);
+            emit('navigate', 'thankyou');
+          }, 8000);
+        });
+
+        return { count };
+      }
+    };
+
+    // Thank You 组件: 静态感谢页面
+    const ThankYouPage = {
+      template: `
+        <div>
+          <h1>🎉 Thank You!</h1>
+          <p>感谢你的等待，美妙时光继续...</p>
+        </div>
+      `
+    };
+
+    // 主应用组件: 负责组件切换的容器
+    const App = {
+      // 注册子组件
+      components: { CounterPage, ThankYouPage },
+      // 使用动态组件 component 实现组件切换
+      // :is 绑定当前要显示的组件名
+      // @navigate 监听子组件的跳转事件
+      template: `
+        <component :is="currentView" @navigate="handleNavigate" />
+      `,
+      setup() {
+        // 当前显示的组件名称
+        const currentView = ref('CounterPage');
+
+        // 处理子组件发出的导航事件
+        // viewName: 目标页面名称
+        const handleNavigate = (viewName) => {
+          // 根据传入的 viewName 切换要显示的组件
+          currentView.value = viewName === 'thankyou' ? 'ThankYouPage' : 'CounterPage';
+        };
+
+        return { currentView, handleNavigate };
+      }
+    };
+
+    // 创建并挂载 Vue 应用
+    createApp(App).mount('#app');
+  </script>
+</body>
+
+</html>
