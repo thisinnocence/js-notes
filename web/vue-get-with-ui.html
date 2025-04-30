@@ -77,10 +77,15 @@
 
         onMounted(async () => {
           try {
-            const response = await axios.get('https://reqres.in/api/users');
+            const response = await axios.get('https://reqres.in/api/users', {
+              headers: {
+                'x-api-key': 'reqres-free-v1'
+              }
+            })
             users.value = response.data.data;
           } catch (err) {
             error.value = 'Request failed: ' + err.message;
+            console.log(err)
           }
         });
 
