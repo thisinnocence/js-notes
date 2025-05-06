@@ -53,7 +53,7 @@ Vue Router 是 Vue.js 官方的路由管理器，用于在单页面应用程序 
    <template>
      <nav>
        <router-link to="/">Home</router-link>
-         <router-link to="/about">About</router-link>
+       <router-link to="/about">About</router-link>
      </nav>
      <router-view></router-view>
    </template>
