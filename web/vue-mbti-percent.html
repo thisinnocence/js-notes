@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MBTI 测试结果组件</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    body {
+      font-family: "Microsoft YaHei", "微软雅黑", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f6f8fb 0%, #f1f4f9 100%);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .progress-bar-text {
+      user-select: none;
+      font-family: "Microsoft YaHei", "微软雅黑", sans-serif;
+    }
+
+    .dimension-label {
+      min-width: 75px;
+      font-weight: 500;
+      font-family: "Microsoft YaHei", "微软雅黑", sans-serif;
+    }
+
+    @media (min-width: 640px) {
+      .dimension-label {
+        min-width: 85px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+
+  <template id="mbti-result-card">
+    <div class="mbti-container bg-white p-4 sm:p-6 rounded-xl shadow-xl max-w-md mx-auto">
+      <h1 class="text-5xl sm:text-6xl font-bold text-center text-gray-800 mb-1 tracking-tight">
+        {{ result.type }}
+      </h1>
+      <p class="text-base sm:text-lg text-center text-gray-600 mb-4 sm:mb-6">
+        {{ result.description }}
+      </p>
+
+      <div class="space-y-3 sm:space-y-4">
+        <div v-for="dim in result.dimensions" :key="dim.id"
+          class="dimension-row flex items-center space-x-2 sm:space-x-3">
+          <span class="dimension-label flex-shrink-0 text-xs sm:text-sm text-gray-700 text-right truncate">
+            {{ dim.left.name }}
+          </span>
+
+          <div class="progress-area flex-grow h-6 sm:h-7 bg-gray-200 rounded-none relative">
+            <div class="absolute top-0 h-full rounded-none flex items-center" :class="[
+                dim.leftDominant ? 'left-0' : 'right-0',
+                dim.score < 3 ? 'min-w-[4px]' : ''
+              ]" :style="{ 
+                width: dim.score + '%', 
+                backgroundColor: dim.color
+              }">
+            </div>
+            <div class="absolute top-0 h-full flex items-center" :class="[
+                dim.leftDominant 
+                  ? dim.score < 10 ? 'left-1' : 'left-0 pl-1'
+                  : dim.score < 10 ? 'right-1' : 'right-0 pr-1',
+                'min-w-[30px]'
+              ]">
+              <span class="text-[10px] sm:text-xs font-semibold text-gray-600">
+                {{ dim.score }}%
+              </span>
+            </div>
+          </div>
+
+          <span class="dimension-label flex-shrink-0 text-xs sm:text-sm text-gray-700 text-left truncate">
+            {{ dim.right.name }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="app-template">
+    <div class="container mx-auto px-4 py-6 sm:py-10">
+      <mbti-result-card :result="mbtiResultData"></mbti-result-card>
+    </div>
+  </template>
+
+  <script type="module">
+    import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+
+    // MbtiResultCard 组件
+    const MbtiResultCard = {
+      props: {
+        result: {
+          type: Object,
+          required: true,
+          validator: (value) => {
+            return 'type' in value && 'description' in value && Array.isArray(value.dimensions);
+          }
+        }
+      },
+      setup(props) {
+        return {
+          result: props.result
+        }
+      },
+      template: '#mbti-result-card'
+    }
+
+    // 主应用
+    const App = {
+      setup() {
+        const mbtiResultData = {
+          type: 'ENTP',
+          description: '(外倾 + 直觉 + 思考 + 感知)',
+          dimensions: [
+            {
+              id: 'EI',
+              left: { name: 'E 外倾' },
+              right: { name: 'I 内倾' },
+              score: 79,
+              leftDominant: true,
+              color: '#facc15'
+            },
+            {
+              id: 'SN',
+              left: { name: 'S 实感' },
+              right: { name: 'N 直觉' },
+              score: 1,
+              leftDominant: false,
+              color: '#38bdf8'
+            },
+            {
+              id: 'TF',
+              left: { name: 'T 思考' },
+              right: { name: 'F 情感' },
+              score: 15,
+              leftDominant: true,
+              color: '#facc15'
+            },
+            {
+              id: 'JP',
+              left: { name: 'J 判断' },
+              right: { name: 'P 感知' },
+              score: 5,
+              leftDominant: false,
+              color: '#38bdf8'
+            }
+          ]
+        }
+
+        return { mbtiResultData }
+      },
+      components: { MbtiResultCard },
+      template: '#app-template'
+    }
+
+    createApp(App).mount('#app')
+  </script>
+</body>
+
+</html>
