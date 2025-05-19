@@ -91,78 +91,60 @@
     </div>
   </template>
 
-  <script type="module">
-    import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+  <script setup type="module">
+    import { createApp, ref, defineComponent } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
 
-    // MbtiResultCard 组件
-    const MbtiResultCard = {
-      props: {
-        result: {
-          type: Object,
-          required: true,
-          validator: (value) => {
-            return 'type' in value && 'description' in value && Array.isArray(value.dimensions);
-          }
-        }
-      },
-      setup(props) {
-        return {
-          result: props.result
-        }
-      },
-      template: '#mbti-result-card'
+    const dimensionConfigs = [
+      { id: 'EI', left: { name: 'E 外倾' }, right: { name: 'I 内倾' }, color: '#facc15' },
+      { id: 'SN', left: { name: 'S 实感' }, right: { name: 'N 直觉' }, color: '#38bdf8' },
+      { id: 'TF', left: { name: 'T 思考' }, right: { name: 'F 情感' }, color: '#facc15' },
+      { id: 'JP', left: { name: 'J 判断' }, right: { name: 'P 感知' }, color: '#38bdf8' }
+    ];
+
+    function processApiData(dimensions) {
+      if (!Array.isArray(dimensions) || dimensions.length !== 4) {
+        throw new Error('API data must be an array of 4 dimension objects');
+      }
+
+      const type = dimensions.map(dim => dim.type.toUpperCase()).join('');
+      const processedDimensions = dimensions.map((dim, index) => ({
+        ...dimensionConfigs[index],
+        score: parseInt(dim.percenttage) || 0,
+        leftDominant: dim.type.toUpperCase() === dimensionConfigs[index].left.name[0]
+      }));
+
+      const typeDesc = dimensions.map((dim, index) => (
+        dim.type.toUpperCase() === dimensionConfigs[index].left.name[0]
+          ? dimensionConfigs[index].left.name.split(' ')[1]
+          : dimensionConfigs[index].right.name.split(' ')[1]
+      ));
+
+      return {
+        type,
+        description: `(${typeDesc.join(' + ')})`,
+        dimensions: processedDimensions
+      };
     }
 
-    // 主应用
-    const App = {
+    const MbtiResultCard = defineComponent({
+      props: { result: { type: Object, required: true } },
+      template: '#mbti-result-card'
+    });
+
+    createApp({
+      components: { MbtiResultCard },
       setup() {
-        const mbtiResultData = {
-          type: 'ENTP',
-          description: '(外倾 + 直觉 + 思考 + 感知)',
-          dimensions: [
-            {
-              id: 'EI',
-              left: { name: 'E 外倾' },
-              right: { name: 'I 内倾' },
-              score: 79,
-              leftDominant: true,
-              color: '#facc15'
-            },
-            {
-              id: 'SN',
-              left: { name: 'S 实感' },
-              right: { name: 'N 直觉' },
-              score: 1,
-              leftDominant: false,
-              color: '#38bdf8'
-            },
-            {
-              id: 'TF',
-              left: { name: 'T 思考' },
-              right: { name: 'F 情感' },
-              score: 15,
-              leftDominant: true,
-              color: '#facc15'
-            },
-            {
-              id: 'JP',
-              left: { name: 'J 判断' },
-              right: { name: 'P 感知' },
-              score: 5,
-              leftDominant: false,
-              color: '#38bdf8'
-            }
-          ]
-        }
+        const mbtiResultData = ref(processApiData([
+          { type: 'E', percenttage: '79%' },
+          { type: 'N', percenttage: '20%' },
+          { type: 'T', percenttage: '5%' },
+          { type: 'P', percenttage: '95%' }
+        ]));
 
         return { mbtiResultData }
       },
-      components: { MbtiResultCard },
       template: '#app-template'
-    }
-
-    createApp(App).mount('#app')
+    }).mount('#app')
   </script>
 </body>
-
 </html>
