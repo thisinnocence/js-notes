@@ -81,8 +81,20 @@ setup() {
 
 Vite 是一款旨在提供更快、更精简的现代 Web 项目开发体验的构建工具。
 
+### Vite功能
+
 - **开发阶段**：Vite 通过 **原生 ES 模块 (ESM)** 直接向浏览器提供源代码。这意味着在开发过程中，它避免了预先捆绑整个应用程序。浏览器负责模块解析和加载。Vite 利用 `esbuild` 对依赖项和 TypeScript 进行极速转译。`index.html` 在 Vite 项目中居于核心地位，被视为源代码和应用程序的入口点。
 - **部署阶段**：对于生产环境，Vite 使用 **Rollup** 捆绑代码。Rollup 预配置为输出高度优化的静态资产。
+
+### Vite原理
+
+当浏览器请求你的 index.html 文件时，Vite 的开发服务器（基于 Node.js）不会直接将原始的 index.html 文件发送给浏览器。在发送之前，Vite 会对其进行一些预处理。这些预处理的目的是为了让浏览器能够正确地加载和运行你的基于 ES 模块的应用程序。
+
+- 注入客户端入口脚本： Vite 需要在浏览器中运行一些客户端代码来处理模块加载、热模块替换 (HMR) 等功能。Vite 会在你的 index.html 中自动注入一个 `<script type="module" src="/@vite/client"></script>` 类似的标签。这个脚本是 Vite 客户端的核心，它负责与开发服务器建立 WebSocket 连接，监听文件变化，并执行 HMR 更新。
+- 处理环境变量和模式： 如果你在 Vite 配置文件中定义了环境变量或使用了不同的构建模式（例如 development, production），Vite 可能会在 index.html 中注入一些全局变量，以便你的客户端代码可以访问这些信息。
+- 转换 `<base>` 标签： 如果你的应用配置了 base 选项（用于指定应用的部署路径），Vite 可能会调整 index.html 中的 `<base>` 标签。
+- 处理 CSS 注入： 当你的组件或模块中引入 CSS 文件时，Vite 会将这些 CSS 提取出来，并在 index.html 的 `<head>` 标签中动态注入 `<link>` 标签，以便浏览器加载这些样式。在开发阶段，为了实现 HMR，CSS 的处理方式可能有所不同，可能会通过 JavaScript 动态注入样式。
+- 其他内部逻辑所需的代码： Vite 可能会根据其内部的运行逻辑，注入一些其他的辅助性代码或属性。
 
 ---
 
@@ -142,8 +154,8 @@ $ tree .
 ### 构建与部署流程
 
 1. **开发阶段**  
-   - 运行 `pnpm dev` 启动 Vite 开发服务器。
-   - Vite 会解析 `index.html`，并通过原生 ES 模块加载 `main.js`。
+   - 运行 `pnpm dev` 启动 Vite 开发服务器。Vite会启动一个基于nodejs的开发服务器。
+   - Vite 会解析 `index.html`，并通过原生 ES 模块加载 `main.js`.
    - `main.js` 引入了 `App.vue`，Vite 会动态编译 `.vue` 文件，将其转换为 JavaScript 模块。
    - 浏览器通过 HMR（热模块替换）实时更新页面，无需刷新。
 
