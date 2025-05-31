@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CountButton from '../components/CountButton.vue'
+import CountButton from '@components/CountButton.vue'
 </script>
 
 <template>
