@@ -131,6 +131,12 @@ $ tree .
 └── vite.config.js
 ```
 
+也可以使用 ts
+
+```bash
+pnpm create vite@latest vue-demo --template vue-ts
+```
+
 ### 文件结构解析
 
 1. **`index.html`**  
