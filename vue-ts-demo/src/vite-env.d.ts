@@ -2,6 +2,7 @@
  * 该文件是 TypeScript 声明文件，用于为 Vite 项目提供类型声明支持。
  * 它可以帮助 TypeScript 编译器识别 Vite 相关的模块和类型，
  * 从而提供更好的类型检查和代码提示。
+ * .d 后缀表示这是一个声明文件(Declaration File)​
  *
  * 这里的 "/// <reference types="vite/client" />" 是一种特殊的 TypeScript 指令，
  * 称为“三斜线指令”。它用于告诉 TypeScript 编译器，
@@ -17,8 +18,17 @@
 
 /// <reference types="vite/client" />
 
+// TypeScript 的模块声明，专门用于处理 .vue 单文件组件（SFC）的类型支持
+// 告诉 TypeScript "所有以 .vue 结尾的导入，都应该被视为 Vue 组件"
+// 这使得在 TypeScript 中使用 Vue 单文件组件时，能够获得类型检查和代码提示的支持
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'
+  
+  // DefineComponent 是 Vue 提供的类型工具，用于定义组件类型
+  // 泛型参数说明（按顺序）：
+  // 1. Props 类型（这里用 {} 表示无 props）
+  // 2. Data 类型（这里用 {} 表示空 data）
+  // 3. Methods/Computed/其他组件选项类型（any 表示允许任意类型）
   const component: DefineComponent<{}, {}, any>
   export default component
 }
