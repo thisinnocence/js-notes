@@ -1,70 +1,66 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import { BContainer } from 'bootstrap-vue-next'
 </script>
 
 <template>
-  <nav class="nav-container">
-    <div class="nav-content">
-      <ul class="nav-list">
-        <li>
-          <RouterLink to="/">Home</RouterLink>
-        </li>
-        <li>
-          <RouterLink to="/posts">Posts</RouterLink>
-        </li>
-        <li>
-          <RouterLink to="/about">About</RouterLink>
-        </li>
-      </ul>
-    </div>
-  </nav>
+  <div class="d-flex flex-column vh-100">
+    <!-- 主导航 -->
+    <nav class="main-nav bg-white border-bottom">
+      <BContainer class="container-custom">
+        <div class="nav-wrapper">
+          <!-- 导航链接 -->
+          <div class="nav-links">
+            <RouterLink to="/" class="nav-link">Home</RouterLink>
+            <RouterLink to="/posts" class="nav-link">Posts</RouterLink>
+            <RouterLink to="/about" class="nav-link">About</RouterLink>
+          </div>
+        </div>
+      </BContainer>
+    </nav>
 
-  <main class="main-content">
-    <RouterView />
-  </main>
+    <!-- 主内容区 -->
+    <main class="flex-grow-1">
+      <BContainer class="container-custom py-4">
+        <RouterView />
+      </BContainer>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer bg-light border-top py-4">
+      <BContainer class="container-custom">
+        <div class="text-muted">
+          <p class="mb-0">&copy; Kitty 2025 All rights reserved.</p>
+        </div>
+      </BContainer>
+    </footer>
+  </div>
 </template>
 
 <style scoped>
-.nav-container {
-  background: #fff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.nav-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem;
+.nav-wrapper {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  padding: 1rem 0;
+  gap: 2rem;
 }
 
-.site-title {
-  font-size: 1.2rem;
-  margin: 0;
-}
-
-.nav-list {
-  list-style: none;
+.nav-links {
   display: flex;
   gap: 1rem;
-  margin: 0;
-  padding: 0;
 }
 
-.nav-list a {
+.nav-link {
+  color: #666;
   text-decoration: none;
-  color: #2c3e50;
+  padding: 0.5rem 1rem;
 }
 
-.nav-list a.router-link-active {
-  color: #e91e63;
-  font-weight: bold;
-}
-
-.main-content {
-  max-width: 1200px;
-  margin: 1rem auto;
-  padding: 0 1rem;
+.container-custom {
+  max-width: 1080px !important;
+  margin: 0 auto;
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 </style>
