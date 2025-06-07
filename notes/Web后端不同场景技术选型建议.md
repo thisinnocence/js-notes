@@ -2,9 +2,18 @@
 
 在开发小型 **CRUD（增删改查）网站** 时，技术选型直接影响开发效率、维护成本和性能。常见的架构选择包括：
 
-1. **服务端渲染（SSR）**（如 Next.js、Django 模板）
+1. **服务端渲染（SSR）** (如 Next.js、Nuxt.js)
 2. **前后端分离**（如 FastAPI + Vue/React）
 3. **Python 后端拼 HTML 标签**（如 Flask + Jinja2）
+
+服务端渲染 (SSR)——广义定义： 最宽泛地讲，SSR 意味着初始的 HTML 是在服务器上生成并发送到客户端的。这与客户端渲染 (CSR) 形成对比，CSR 是指浏览器接收到一个最小的 HTML 文件，然后通过 JavaScript 在客户端渲染内容。
+
+Next.js (及类似的 JavaScript 框架，如Nuxt.js)： 当今谈论“SSR”时，尤其是在 JavaScript 框架的语境下，人们通常指的是同构/通用 JavaScript 应用。
+
+- 这类应用在服务器和客户端都使用 JavaScript。
+- 同一套代码可以在服务器上渲染初始 HTML，以提高性能和 SEO。
+- 然后，在客户端，JavaScript 会“注水（hydrate）”页面，接管交互性及后续的导航（通常作为单页应用 - SPA）。
+- 这提供了一种无缝的用户体验，融合了 SSR 和 CSR 的优点。
 
 本文结合技术对比和实际场景，帮你做出最优选择。
 
