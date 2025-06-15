@@ -1,8 +1,8 @@
-# Vue3+TS全栈技术选型：为什么FastAPI+SQLite是最佳轻量级组合？
+# Vue3+TS全栈技术选型：Python FastAPI+SQLite是最佳轻量级组合
 
 ## 引言
 
-当我们需要构建一个**Vue3前端 + TypeScript + SQLite数据库**的全栈项目时，后端框架的选择直接影响开发效率和最终性能。本文将通过完整的技术栈对比，解释为什么**Python FastAPI**比Node.js Fastify更适合轻量级CRUD应用。
+当我们需要构建一个**Vue3 + TypeScript + SQLite数据库**的全栈项目时，后端框架的选择直接影响开发效率和最终性能。本文将通过完整的技术栈对比，解释为什么**Python FastAPI**比Node.js Fastify更适合轻量级CRUD应用。
 
 ---
 
@@ -10,17 +10,17 @@
 
 你明确提出的技术组合：
 
-| 层级 | 技术选型 | 版本要求 |
+| 层级 | 技术选型 | 备注 |
 | :--------- | :----------------- | :------------- |
 | **前端** | Vue3 + Vite + TS | Composition API |
-| **后端** | 待选：FastAPI/Fastify | - |
-| **数据库** | SQLite3 | 本地文件 |
+| **后端** | FastAPI/Fastify | 开发效率与性能的权衡 |
+| **数据库** | SQLite3 | 本地文件DB |
 
 ---
 
-## 2. 为什么推荐FastAPI？
+## 2. 为什么推荐Python FastAPI？
 
-### (1) 前后端对接零摩擦
+### (1) 前后端对接方便
 
 ```js
 // Vue3组件调用示例（基于FastAPI自动生成的OpenAPI）
@@ -43,7 +43,7 @@ const fetchItems = async () => {
 ### (2) SQLite集成的优雅实现
 
 ```python
-# FastAPI直接操作SQLite（无ORM学习成本）
+# FastAPI直接操作SQLite很方便, 也可以使用简单的ORM如SQLAlchemy等
 import sqlite3
 conn = sqlite3.connect('app.db')  # 单文件数据库
 
@@ -53,7 +53,7 @@ async def read_item(id: int):
     return dict(cursor.fetchone())  # 自动转JSON
 ```
 
-✅ vs Fastify+TS：
+对比Nodejs的Fastify
 
 ```typescript
 // Fastify需要额外安装better-sqlite3
@@ -61,7 +61,7 @@ import Database from 'better-sqlite3';
 const db = new Database('app.db');  // 第三方库，增加额外依赖
 ```
 
-**对比**：Python 内置了 `sqlite3` 模块，无需额外安装即可直接操作 SQLite 数据库，开箱即用。而 Node.js 则需要依赖第三方库（如 `better-sqlite3`），虽然这些库通常性能良好，但仍增加了项目依赖和初始配置的复杂性。
+Python 内置了 `sqlite3` 模块，无需额外安装即可直接操作 SQLite 数据库，开箱即用。而 Node.js 则需要依赖第三方库（如 `better-sqlite3`），虽然这些库通常性能良好，但仍增加了项目依赖和初始配置的复杂性。
 
 ### (3) 开发效率碾压式对比
 
@@ -82,15 +82,18 @@ const db = new Database('app.db');  // 第三方库，增加额外依赖
 ```bash
 # 1. 创建项目
 mkdir myapp && cd myapp
+
+# 2. 初始化Python虚拟环境
 python -m venv venv
-source venv/bin/activate
+source venv/bin/activate  # Linux/macOS
 
-# 2. 安装依赖
-pip install fastapi uvicorn
+# 3. 使用uv安装依赖
+pip install uv  # 首次安装uv
+uv pip install fastapi uvicorn
 
-# 3. 创建app.py（示例代码见上文）
+# 4. 创建app.py（示例代码见上文）
 
-# 4. 启动开发服务器
+# 5. 启动开发服务器
 uvicorn app:app --reload --port 3000
 ```
 
@@ -98,9 +101,10 @@ uvicorn app:app --reload --port 3000
 
 ```bash
 # 1. 初始化项目
-npm init -y
-npm install typescript ts-node fastify @fastify/swagger better-sqlite3
-npx tsc --init
+# 1. 初始化项目
+pnpm init
+pnpm add typescript ts-node fastify @fastify/swagger better-sqlite3
+pnpx tsc --init
 
 # 2. 配置tsconfig.json、编写路由...
 
@@ -135,7 +139,7 @@ async def list_items(page: int = 1, size: int = 10):
     return db.query("... LIMIT ? OFFSET ?", (size, (page-1)*size))
 ```
 
-### 致命问题
+### 其他问题
 
 * **SQLite支持需额外依赖**：Node.js 使用 SQLite 需要安装第三方库，增加了项目依赖和管理成本。
 * **类型同步成本**：虽然有工具可以辅助，但相比 **FastAPI** 的自动生成，**Fastify+TS** 在前后端 **TypeScript** 定义的同步上仍需更多手动干预或额外配置。
@@ -147,11 +151,11 @@ async def list_items(page: int = 1, size: int = 10):
 
 ```mermaid
 graph LR
-    A[Vue3+TS前端] --> B{数据库选择}
-    B -->|轻量级/文件型数据库 (如SQLite)| C[FastAPI后端]
-    B -->|企业级/关系型数据库 (如PostgreSQL)| D[FastAPI 或 Fastify+TS]
-    C --> E[优势：自动文档/快速开发/原生SQLite支持]
-    D --> F[优势：高扩展性/社区生态]
+  A[Vue3+TS前端] --> B{数据库选择}
+  B -->|轻量级/文件型数据库 SQLite| C[FastAPI后端]
+  B -->|企业级/关系型数据库 PostgreSQL| D[FastAPI 或 Fastify+TS]
+  C --> E[优势: 自动文档/快速开发/原生SQLite支持]
+  D --> F[优势: 更高性能/更严格工程化]
 ```
 
 ---
@@ -170,7 +174,7 @@ graph LR
 
 ---
 
-## 附录资源
+## 附录
 
 * [FastAPI+SQLite完整示例代码](https://github.com/tiangolo/full-stack-fastapi-template)
 * [Vue3使用OpenAPI类型生成](https://github.com/ferdikoomen/openapi-typescript-codegen)
