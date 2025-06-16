@@ -10,11 +10,11 @@ import { BContainer } from 'bootstrap-vue-next'
       <BContainer class="container-custom">
         <div class="nav-wrapper">
           <!-- 导航链接 -->
-          <div class="nav-links">
-            <RouterLink to="/" class="nav-link">Home</RouterLink>
-            <RouterLink to="/posts" class="nav-link">Posts</RouterLink>
-            <RouterLink to="/about" class="nav-link">About</RouterLink>
-          </div>
+            <div class="nav-links">
+            <RouterLink to="/" class="nav-link" active-class="nav-link-active">Home</RouterLink>
+            <RouterLink to="/posts" class="nav-link" active-class="nav-link-active">Posts</RouterLink>
+            <RouterLink to="/about" class="nav-link" active-class="nav-link-active">About</RouterLink>
+            </div>
         </div>
       </BContainer>
     </nav>
@@ -38,6 +38,15 @@ import { BContainer } from 'bootstrap-vue-next'
 </template>
 
 <style scoped>
+.main-nav {
+  background-color: #E8F5E9; /* 淡绿色背景色 */
+}
+
+.nav-link-active {
+  color: #4CAF50; /* 活动链接颜色 */
+  font-weight: bold;
+}
+
 .nav-wrapper {
   display: flex;
   align-items: center;
